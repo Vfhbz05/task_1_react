@@ -1,41 +1,67 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import styles from './App.module.css';
+import data from '../data.json';
 
-function App() {
-	//Императивный стиль
-  const [count, setCount] = useState(0)
-  const currentYear = new Date().getFullYear()
 
-  return (
-	//Декларативный стиль
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-	  <p>
-		Текущий год: {currentYear}
-	  </p>
-    </>
-  )
-}
 
-export default App
+export const App = () => {
+	const [steps] = useState(data);
+	const [activeIndex, setActiveIndex] = useState(0);
+	
+	let isFirstStep = activeIndex === 0;
+	let isLastStep = activeIndex === steps.length -1;
+	
+	const onClickBack = ()=>{
+		if(!isFirstStep){
+		setActiveIndex(activeIndex - 1);
+		};
+	}
+
+	const onClickForward= ()=>{
+		console.log('Шаг вперед');
+		if(!isLastStep){
+			setActiveIndex(activeIndex + 1);
+		}
+		
+	}
+	const onClickStartOver =()=>{
+		setActiveIndex(0);
+	}
+
+	const onClickToStep = (index) => {
+		setActiveIndex(index);
+	}
+
+	return (
+		<div className={styles.container}>
+			<div className={styles.card}>
+				<h1>Инструкция по готовке пельменей</h1>
+				<div className={styles.steps}>
+					<div className={styles['steps-content']}>
+						{steps[activeIndex].content}
+					</div>
+					<ul className={styles['steps-list']}> {
+					steps.map((el, index) =>
+					
+					<li className={
+						`${styles['steps-item']}  
+						${index === activeIndex ? styles.active : ''}  
+						${index <= activeIndex ? styles.done : ''}`
+						} 
+						key = {el.id}>
+						<button onClick = {() => onClickToStep(index)} className={styles['steps-item-button']}>{index+1}</button>
+						{el.title}
+						</li>
+					)}
+					</ul>
+					<div className={styles['buttons-container']}>
+						<button className={styles.button} disabled = {isFirstStep} onClick = {onClickBack}>Назад</button>
+						<button className={styles.button} onClick = {isLastStep ? onClickStartOver : onClickForward}>
+							{isLastStep ? 'Начать сначала' : 'Далее'}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
